@@ -31,14 +31,14 @@ function Register() {
     setError(null)
 
     try {
-      const response = await register(formData, 'NORMAL_USER')
+      const response = await register(formData)
       console.log('Registration successful:', response)
 
       if (response.user) {
         setUser(response.user)
       }
 
-      navigate('/login')
+      navigate('/explore')
     } catch (err) {
       console.error('Error registering:', err)
       setError(err?.response?.data?.String || 'Failed to register')
