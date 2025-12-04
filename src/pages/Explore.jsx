@@ -5,8 +5,10 @@ import { useUser } from '../context/UserContext'
 import { addListing } from '../services/listing'
 
 function Explore() {
-  const { user } = useUser()
+  const { user: token } = useUser()
   const [showModal, setShowModal] = useState(false)
+
+  // -- Main Listing Form Data --
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -16,9 +18,36 @@ function Explore() {
     vehicleType: '',
     vehicleCondition: 'GOOD',
   })
+
+  // -- Availability State --
+  // Stores the list of periods to be submitted
+  const [availabilityPeriods, setAvailabilityPeriods] = useState([])
+  // Stores the temporary state for the "Add Period" sub-form
+  const [currentPeriod, setCurrentPeriod] = useState({
+    startDay: 'MONDAY',
+    endDay: 'FRIDAY',
+    startTime: '',
+    endTime: '',
+  })
+
+  // -- Photos State --
+  const [selectedFiles, setSelectedFiles] = useState([])
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+
+  const daysOfWeek = [
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+    'SUNDAY',
+  ]
+
+  // --- Handlers ---
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -28,10 +57,60 @@ function Explore() {
     }))
   }
 
+  // Handle inputs for the "Add Availability" sub-form
+  const handlePeriodChange = (e) => {
+    const { name, value } = e.target
+    setCurrentPeriod((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  // Add the current period to the list
+  const addAvailabilityPeriod = () => {
+    if (!currentPeriod.startTime || !currentPeriod.endTime) {
+      alert('Please select both start and end times.')
+      return
+    }
+    setAvailabilityPeriods((prev) => [...prev, currentPeriod])
+    // Reset time fields for convenience, keep days
+    setCurrentPeriod((prev) => ({
+      ...prev,
+      startTime: '',
+      endTime: '',
+    }))
+  }
+
+  // Remove a period from the list
+  const removeAvailabilityPeriod = (index) => {
+    setAvailabilityPeriods((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Handle file selection
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+      setSelectedFiles(Array.from(e.target.files))
+    }
+  }
+
+  // Helper: Convert file to Base64 and strip the data URL prefix
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        // Remove "data:image/png;base64," prefix to get raw bytes for Java byte[]
+        const base64String = reader.result.split(',')[1]
+        resolve(base64String)
+      }
+      reader.onerror = (error) => reject(error)
+    })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!user) {
+    if (!token) {
       setError('No user logged in')
       return
     }
@@ -40,10 +119,27 @@ function Explore() {
     setError(null)
 
     try {
+      // 1. Process Photos
+      const processedPhotos = await Promise.all(
+        selectedFiles.map(async (file) => {
+          const base64Data = await fileToBase64(file)
+          return { data: base64Data } // Matches ListingPhoto entity structure
+        })
+      )
+
+      // 2. Process Availability
+      // Ensure time formats are HH:mm:ss (or HH:mm is often accepted, but :00 is safer)
+      const processedAvailability = availabilityPeriods.map((period) => ({
+        startDay: period.startDay,
+        endDay: period.endDay,
+        // Append seconds if missing, assuming input type="time" gives HH:mm
+        startTime: period.startTime.length === 5 ? `${period.startTime}:00` : period.startTime,
+        endTime: period.endTime.length === 5 ? `${period.endTime}:00` : period.endTime,
+      }))
+
+
+      // 3. Construct payload
       const listingData = {
-        owner: {
-          id: user.id,
-        },
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
@@ -54,18 +150,20 @@ function Explore() {
         },
         pickUpLocation: formData.pickUpLocation,
         dropOffLocation: formData.dropOffLocation,
-        availability: [],
-        photos: [],
+        
+        // Mapped collections
+        availability: processedAvailability,
+        photos: processedPhotos,
       }
 
-      console.log(listingData)
+      console.log('Sending Payload:', listingData)
 
-      const response = await addListing(listingData, user.id)
+      const response = await addListing(listingData)
 
       console.log('Listing created:', response)
       setSuccess(true)
 
-      // Reset form
+      // Reset all form states
       setFormData({
         title: '',
         description: '',
@@ -74,6 +172,14 @@ function Explore() {
         dropOffLocation: '',
         vehicleType: '',
         vehicleCondition: 'GOOD',
+      })
+      setAvailabilityPeriods([])
+      setSelectedFiles([])
+      setCurrentPeriod({
+        startDay: 'MONDAY',
+        endDay: 'FRIDAY',
+        startTime: '',
+        endTime: '',
       })
 
       // Close modal after 2 seconds
@@ -143,7 +249,7 @@ function Explore() {
                 backgroundColor: 'white',
                 padding: '30px',
                 borderRadius: '10px',
-                maxWidth: '500px',
+                maxWidth: '600px',
                 width: '90%',
                 maxHeight: '90vh',
                 overflow: 'auto',
@@ -181,153 +287,211 @@ function Explore() {
               )}
 
               <form onSubmit={handleSubmit}>
+                {/* --- Basic Info --- */}
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Title *
-                  </label>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>Title *</label>
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
+                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Description *
-                  </label>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>Description *</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
                     required
-                    rows={4}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
+                    rows={3}
+                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
                   />
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Price (€) *
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    required
-                    step="0.01"
-                    min="0"
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
-                  />
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Price (€) *</label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      required
+                      step="0.01"
+                      min="0"
+                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Vehicle Condition *</label>
+                    <select
+                      name="vehicleCondition"
+                      value={formData.vehicleCondition}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    >
+                      <option value="EXCELLENT">Excellent</option>
+                      <option value="GOOD">Good</option>
+                      <option value="NEEDS_WORK">Needs Work</option>
+                      <option value="POOR">Poor</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Vehicle Type *
-                  </label>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>Vehicle Type *</label>
                   <input
                     type="text"
                     name="vehicleType"
                     value={formData.vehicleType}
                     onChange={handleInputChange}
                     required
-                    placeholder="e.g., Car, Bike, Scooter"
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
+                    placeholder="e.g. Bike, Scooter"
+                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
                   />
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Vehicle Condition *
-                  </label>
-                  <select
-                    name="vehicleCondition"
-                    value={formData.vehicleCondition}
-                    onChange={handleInputChange}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
-                  >
-                    <option value="EXCELLENT">Excellent</option>
-                    <option value="GOOD">Good</option>
-                    <option value="NEEDS_WORK">Needs Work</option>
-                    <option value="POOR">Poor</option>
-                  </select>
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Pick-up Location *</label>
+                    <input
+                      type="text"
+                      name="pickUpLocation"
+                      value={formData.pickUpLocation}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Drop-off Location *</label>
+                    <input
+                      type="text"
+                      name="dropOffLocation"
+                      value={formData.dropOffLocation}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Pick-up Location *
-                  </label>
+                {/* --- Photos Section --- */}
+                <div style={{ marginBottom: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Photos</label>
                   <input
-                    type="text"
-                    name="pickUpLocation"
-                    value={formData.pickUpLocation}
-                    onChange={handleInputChange}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ marginBottom: '10px' }}
                   />
+                  {selectedFiles.length > 0 && (
+                    <div style={{ fontSize: '0.9em', color: '#666' }}>
+                      {selectedFiles.length} file(s) selected
+                    </div>
+                  )}
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>
-                    Drop-off Location *
-                  </label>
-                  <input
-                    type="text"
-                    name="dropOffLocation"
-                    value={formData.dropOffLocation}
-                    onChange={handleInputChange}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                    }}
-                  />
+                {/* --- Availability Section --- */}
+                <div style={{ marginBottom: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Availability Periods</label>
+                  
+                  {/* Add New Period Sub-form */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '10px' }}>
+                    <div style={{ flex: '1 1 120px' }}>
+                      <label style={{ fontSize: '0.85em' }}>Start Day</label>
+                      <select
+                        name="startDay"
+                        value={currentPeriod.startDay}
+                        onChange={handlePeriodChange}
+                        style={{ width: '100%', padding: '5px' }}
+                      >
+                        {daysOfWeek.map(day => <option key={day} value={day}>{day}</option>)}
+                      </select>
+                    </div>
+                    <div style={{ flex: '1 1 120px' }}>
+                      <label style={{ fontSize: '0.85em' }}>End Day</label>
+                      <select
+                        name="endDay"
+                        value={currentPeriod.endDay}
+                        onChange={handlePeriodChange}
+                        style={{ width: '100%', padding: '5px' }}
+                      >
+                         {daysOfWeek.map(day => <option key={day} value={day}>{day}</option>)}
+                      </select>
+                    </div>
+                    <div style={{ flex: '1 1 100px' }}>
+                      <label style={{ fontSize: '0.85em' }}>Start Time</label>
+                      <input
+                        type="time"
+                        name="startTime"
+                        value={currentPeriod.startTime}
+                        onChange={handlePeriodChange}
+                        style={{ width: '100%', padding: '5px' }}
+                      />
+                    </div>
+                    <div style={{ flex: '1 1 100px' }}>
+                      <label style={{ fontSize: '0.85em' }}>End Time</label>
+                      <input
+                        type="time"
+                        name="endTime"
+                        value={currentPeriod.endTime}
+                        onChange={handlePeriodChange}
+                        style={{ width: '100%', padding: '5px' }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addAvailabilityPeriod}
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        marginBottom: '1px' // align with inputs
+                      }}
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {/* List of Added Periods */}
+                  {availabilityPeriods.length > 0 && (
+                    <div style={{ background: '#f8f9fa', padding: '10px', borderRadius: '5px' }}>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9em' }}>
+                        {availabilityPeriods.map((p, idx) => (
+                          <li key={idx} style={{ marginBottom: '5px' }}>
+                            {p.startDay} to {p.endDay} ({p.startTime} - {p.endTime})
+                            <button
+                              type="button"
+                              onClick={() => removeAvailabilityPeriod(idx)}
+                              style={{
+                                marginLeft: '10px',
+                                color: '#dc3545',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '10px',
-                    justifyContent: 'flex-end',
-                  }}
-                >
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
                   <button
                     type="button"
                     onClick={handleCloseModal}
