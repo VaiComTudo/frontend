@@ -182,11 +182,14 @@ function Explore() {
         endTime: '',
       })
 
-      // Close modal after 2 seconds
+      // Close modal after 2 seconds, keep success flag a bit longer for the toast
       setTimeout(() => {
         setShowModal(false)
-        setSuccess(false)
       }, 2000)
+      // Hide success toast after 3 seconds
+      setTimeout(() => {
+        setSuccess(false)
+      }, 3000)
     } catch (err) {
       console.error('Error creating listing:', err)
       setError(err.response?.data?.message || 'Failed to create listing')
@@ -204,6 +207,24 @@ function Explore() {
   return (
     <>
       <NavBar />
+
+      {/* Success toast */}
+      {success && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#28a745',
+          color: 'white',
+          padding: '12px 18px',
+          borderRadius: '6px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 2000,
+          fontWeight: '600'
+        }}>
+          Listing created successfully!
+        </div>
+      )}
 
       <main
         style={{
