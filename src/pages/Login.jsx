@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { login } from '../services/authentication'
+import { useUser } from '../context/UserContext'
 
 function Login() {
   const navigate = useNavigate()
@@ -12,6 +13,7 @@ function Login() {
     password: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { setUser } = useUser()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -29,6 +31,19 @@ function Login() {
     try {
       const response = await login(formData)
       console.log('Login successful:', response)
+
+      // The backend returns a JWT object like { token: '...' }
+      const token = response?.token
+      if (token) {
+        // Set user in context to the token string
+        setUser(token)
+
+        // Persist token under the `token` key (used by getAuthHeaders)
+        localStorage.setItem('token', token)
+      } else {
+        // Fallback: set entire response
+        setUser(response)
+      }
 
       navigate('/explore')
     } catch (err) {
