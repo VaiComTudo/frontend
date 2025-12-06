@@ -96,6 +96,17 @@ function MyListings() {
                   >
                     {listing.vehicle?.type} - {listing.vehicle?.condition}
                   </p>
+                  <p
+                    id={`listing-state-${listing.id}`}
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color:
+                        listing.state === 'AVAILABLE' ? '#28a745' : '#6c757d',
+                    }}
+                  >
+                    Status: {listing.state}
+                  </p>
                 </div>
               ))}
             </div>
