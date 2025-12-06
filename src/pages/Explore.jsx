@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { useUser } from '../context/UserContext'
 import { addListing } from '../services/listing'
 
 function Explore() {
-  const { user: token } = useUser()
   const [showModal, setShowModal] = useState(false)
 
   // -- Main Listing Form Data --
@@ -110,7 +108,11 @@ function Explore() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!token) {
+    const storedToken = localStorage.getItem('token')
+    console.log('Checking token in handleSubmit:', storedToken)
+
+    if (!storedToken) {
+      console.log('No token found!')
       setError('No user logged in')
       return
     }
@@ -124,7 +126,7 @@ function Explore() {
         selectedFiles.map(async (file) => {
           const base64Data = await fileToBase64(file)
           return { data: base64Data } // Matches ListingPhoto entity structure
-        })
+        }),
       )
 
       // 2. Process Availability
@@ -133,10 +135,13 @@ function Explore() {
         startDay: period.startDay,
         endDay: period.endDay,
         // Append seconds if missing, assuming input type="time" gives HH:mm
-        startTime: period.startTime.length === 5 ? `${period.startTime}:00` : period.startTime,
-        endTime: period.endTime.length === 5 ? `${period.endTime}:00` : period.endTime,
+        startTime:
+          period.startTime.length === 5
+            ? `${period.startTime}:00`
+            : period.startTime,
+        endTime:
+          period.endTime.length === 5 ? `${period.endTime}:00` : period.endTime,
       }))
-
 
       // 3. Construct payload
       const listingData = {
@@ -150,7 +155,7 @@ function Explore() {
         },
         pickUpLocation: formData.pickUpLocation,
         dropOffLocation: formData.dropOffLocation,
-        
+
         // Mapped collections
         availability: processedAvailability,
         photos: processedPhotos,
@@ -210,18 +215,20 @@ function Explore() {
 
       {/* Success toast */}
       {success && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          backgroundColor: '#28a745',
-          color: 'white',
-          padding: '12px 18px',
-          borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          zIndex: 2000,
-          fontWeight: '600'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '12px 18px',
+            borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 2000,
+            fontWeight: '600',
+          }}
+        >
           Listing created successfully!
         </div>
       )}
@@ -310,32 +317,50 @@ function Explore() {
               <form onSubmit={handleSubmit}>
                 {/* --- Basic Info --- */}
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>Title *</label>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>
+                    Title *
+                  </label>
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
                     required
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                    }}
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>Description *</label>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>
+                    Description *
+                  </label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
                     required
                     rows={3}
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                    }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div
+                  style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}
+                >
                   <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Price (€) *</label>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>
+                      Price (€) *
+                    </label>
                     <input
                       type="number"
                       name="price"
@@ -344,17 +369,29 @@ function Explore() {
                       required
                       step="0.01"
                       min="0"
-                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Vehicle Condition *</label>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>
+                      Vehicle Condition *
+                    </label>
                     <select
                       name="vehicleCondition"
                       value={formData.vehicleCondition}
                       onChange={handleInputChange}
                       required
-                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
                     >
                       <option value="EXCELLENT">Excellent</option>
                       <option value="GOOD">Good</option>
@@ -365,7 +402,9 @@ function Explore() {
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>Vehicle Type *</label>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>
+                    Vehicle Type *
+                  </label>
                   <input
                     type="text"
                     name="vehicleType"
@@ -373,38 +412,73 @@ function Explore() {
                     onChange={handleInputChange}
                     required
                     placeholder="e.g. Bike, Scooter"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                    }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div
+                  style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}
+                >
                   <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Pick-up Location *</label>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>
+                      Pick-up Location *
+                    </label>
                     <input
                       type="text"
                       name="pickUpLocation"
                       value={formData.pickUpLocation}
                       onChange={handleInputChange}
                       required
-                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Drop-off Location *</label>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>
+                      Drop-off Location *
+                    </label>
                     <input
                       type="text"
                       name="dropOffLocation"
                       value={formData.dropOffLocation}
                       onChange={handleInputChange}
                       required
-                      style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
                     />
                   </div>
                 </div>
 
                 {/* --- Photos Section --- */}
-                <div style={{ marginBottom: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Photos</label>
+                <div
+                  style={{
+                    marginBottom: '20px',
+                    borderTop: '1px solid #eee',
+                    paddingTop: '15px',
+                  }}
+                >
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '5px',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Photos
+                  </label>
                   <input
                     type="file"
                     multiple
@@ -420,11 +494,33 @@ function Explore() {
                 </div>
 
                 {/* --- Availability Section --- */}
-                <div style={{ marginBottom: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Availability Periods</label>
-                  
+                <div
+                  style={{
+                    marginBottom: '20px',
+                    borderTop: '1px solid #eee',
+                    paddingTop: '15px',
+                  }}
+                >
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '10px',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Availability Periods
+                  </label>
+
                   {/* Add New Period Sub-form */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '10px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      alignItems: 'flex-end',
+                      marginBottom: '10px',
+                    }}
+                  >
                     <div style={{ flex: '1 1 120px' }}>
                       <label style={{ fontSize: '0.85em' }}>Start Day</label>
                       <select
@@ -433,7 +529,11 @@ function Explore() {
                         onChange={handlePeriodChange}
                         style={{ width: '100%', padding: '5px' }}
                       >
-                        {daysOfWeek.map(day => <option key={day} value={day}>{day}</option>)}
+                        {daysOfWeek.map((day) => (
+                          <option key={day} value={day}>
+                            {day}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div style={{ flex: '1 1 120px' }}>
@@ -444,7 +544,11 @@ function Explore() {
                         onChange={handlePeriodChange}
                         style={{ width: '100%', padding: '5px' }}
                       >
-                         {daysOfWeek.map(day => <option key={day} value={day}>{day}</option>)}
+                        {daysOfWeek.map((day) => (
+                          <option key={day} value={day}>
+                            {day}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div style={{ flex: '1 1 100px' }}>
@@ -477,7 +581,7 @@ function Explore() {
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
-                        marginBottom: '1px' // align with inputs
+                        marginBottom: '1px', // align with inputs
                       }}
                     >
                       Add
@@ -486,11 +590,24 @@ function Explore() {
 
                   {/* List of Added Periods */}
                   {availabilityPeriods.length > 0 && (
-                    <div style={{ background: '#f8f9fa', padding: '10px', borderRadius: '5px' }}>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9em' }}>
+                    <div
+                      style={{
+                        background: '#f8f9fa',
+                        padding: '10px',
+                        borderRadius: '5px',
+                      }}
+                    >
+                      <ul
+                        style={{
+                          margin: 0,
+                          paddingLeft: '20px',
+                          fontSize: '0.9em',
+                        }}
+                      >
                         {availabilityPeriods.map((p, idx) => (
                           <li key={idx} style={{ marginBottom: '5px' }}>
-                            {p.startDay} to {p.endDay} ({p.startTime} - {p.endTime})
+                            {p.startDay} to {p.endDay} ({p.startTime} -{' '}
+                            {p.endTime})
                             <button
                               type="button"
                               onClick={() => removeAvailabilityPeriod(idx)}
@@ -500,7 +617,7 @@ function Explore() {
                                 background: 'none',
                                 border: 'none',
                                 cursor: 'pointer',
-                                textDecoration: 'underline'
+                                textDecoration: 'underline',
                               }}
                             >
                               Remove
@@ -512,7 +629,14 @@ function Explore() {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '10px',
+                    justifyContent: 'flex-end',
+                    marginTop: '20px',
+                  }}
+                >
                   <button
                     type="button"
                     onClick={handleCloseModal}
