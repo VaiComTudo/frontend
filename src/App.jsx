@@ -3,7 +3,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Resgister';
 import Explore from './pages/Explore';
-import BrowseItems from './pages/BrowseItems';
+import MyListings from './pages/MyListings';
 import { UserProvider } from './context/UserContext';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             <Route path='/explore' element={<Explore />} />
-            <Route path='/browse' element={<BrowseItems />} />
+            <Route path='/my-listings' element={<MyListings />} />
 
             <Route path="*" element={<Navigate to={"/"} replace />} />
           </Routes>
