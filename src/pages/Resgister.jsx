@@ -34,7 +34,15 @@ function Register() {
       const response = await register(formData)
       console.log('Registration successful:', response)
 
-      if (response.user) {
+      // The backend returns a JWT object like { token: '...' }
+      const token = response?.token
+      if (token) {
+        // Set user in context to the token string
+        setUser(token)
+
+        // Persist token under the `token` key (used by getAuthHeaders)
+        localStorage.setItem('token', token)
+      } else if (response.user) {
         setUser(response.user)
       }
 
