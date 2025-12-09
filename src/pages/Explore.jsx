@@ -52,7 +52,8 @@ function Explore() {
 
   // --- Fetch Listings ---
   const fetchListings = async (location = null) => {
-    if (!token) return
+    const storedToken = localStorage.getItem('token')
+    if (!storedToken) return
 
     setLoading(true)
     setErrorLoading(null)
@@ -69,11 +70,12 @@ function Explore() {
   }
 
   useEffect(() => {
-    if (token) {
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
       fetchListings(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
+  }, [])
 
   // --- Handlers ---
 
@@ -276,6 +278,9 @@ function Explore() {
         }}
       >
         <div style={{ marginBottom: '20px' }}>
+          <h1 style={{ marginBottom: '20px', fontSize: '28px', fontWeight: 'bold' }}>
+            Procurar Itens Disponíveis
+          </h1>
           <button
             onClick={() => setShowModal(true)}
             style={{
