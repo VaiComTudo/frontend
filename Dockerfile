@@ -1,6 +1,6 @@
 # Stage 1: Build the React application
 # Use a Node image to compile the assets
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 
@@ -13,10 +13,16 @@ COPY . .
 RUN npm run build 
 
 # Stage 2: Serve the application with Nginx
-# Use a tiny Nginx image for serving static files
 FROM nginx:alpine
-# Copy the built files from the build stage to Nginx's default HTML directory
-# This directory contains your production React application
+
+# Remove default nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy your custom configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built React files
 COPY --from=build /app/dist /usr/share/nginx/html
+
 EXPOSE 80
-# Nginx is the entrypoint and will start serving the files
+CMD ["nginx", "-g", "daemon off;"]
