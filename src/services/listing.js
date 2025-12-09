@@ -33,7 +33,7 @@ export const getListings = async (page = 0, size = 10, sortBy = 'title', sortDir
   return response.data
 }
 
-export const getListings = async (category = null, location = null) => {
+export const getRenterListings = async (category = null, location = null) => {
   const params = {}
   if (category) params.category = category
   if (location) params.location = location

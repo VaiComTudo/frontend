@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useUser } from '../context/UserContext'
-import { addListing, getListings } from '../services/listing'
+import { addListing, getRenterListings } from '../services/listing'
 
 function Explore() {
   const [showModal, setShowModal] = useState(false)
@@ -59,7 +59,7 @@ function Explore() {
     setErrorLoading(null)
     try {
       const locationParam = location !== null ? location : (locationFilter.trim() || null)
-      const data = await getListings(null, locationParam)
+      const data = await getRenterListings(null, locationParam)
       setListings(data)
     } catch (err) {
       console.error('Error fetching listings:', err)
