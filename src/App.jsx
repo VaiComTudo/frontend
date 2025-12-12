@@ -18,7 +18,7 @@ function App() {
             <Route path='/explore' element={<Explore />} />
             <Route path='/my-listings' element={<MyListings />} />
 
-             <Route path="*" element={<Navigate to={"/"} replace />} />
+            <Route path="*" element={<Navigate to={"/"} replace />} />
           </Routes>
         </BrowserRouter>
       </div>
@@ -26,4 +26,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
