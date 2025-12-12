@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { addListing } from '../services/listing'
+import { useUser } from '../context/UserContext'
+import { addListing, getRenterListings } from '../services/listing'
 
 function Explore() {
   const [showModal, setShowModal] = useState(false)
+  const [listings, setListings] = useState([])
+  const [locationFilter, setLocationFilter] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [errorLoading, setErrorLoading] = useState(null)
 
   // -- Main Listing Form Data --
   const [formData, setFormData] = useState({
@@ -44,6 +49,33 @@ function Explore() {
     'SATURDAY',
     'SUNDAY',
   ]
+
+  // --- Fetch Listings ---
+  const fetchListings = async (location = null) => {
+    const storedToken = localStorage.getItem('token')
+    if (!storedToken) return
+
+    setLoading(true)
+    setErrorLoading(null)
+    try {
+      const locationParam = location !== null ? location : (locationFilter.trim() || null)
+      const data = await getRenterListings(null, locationParam)
+      setListings(data)
+    } catch (err) {
+      console.error('Error fetching listings:', err)
+      setErrorLoading(err.response?.data?.message || 'Erro ao carregar listings')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
+      fetchListings(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // --- Handlers ---
 
@@ -195,6 +227,9 @@ function Explore() {
       setTimeout(() => {
         setSuccess(false)
       }, 3000)
+
+      // Refresh listings after creating a new one
+      fetchListings()
     } catch (err) {
       console.error('Error creating listing:', err)
       setError(err.response?.data?.message || 'Failed to create listing')
@@ -239,22 +274,169 @@ function Explore() {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '20px',
+          minHeight: '80vh',
         }}
       >
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-          }}
-        >
-          Add New Listing
-        </button>
+        <div style={{ marginBottom: '20px' }}>
+          <h1 style={{ marginBottom: '20px', fontSize: '28px', fontWeight: 'bold' }}>
+            Procurar Itens Disponíveis
+          </h1>
+          <button
+            onClick={() => setShowModal(true)}
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              marginBottom: '20px',
+            }}
+          >
+            Add New Listing
+          </button>
+
+          {/* Filtro de Localização */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              Filtrar por Localização
+            </label>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input
+                type="text"
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                placeholder="Digite uma localização (ex: Lisboa, Porto...)"
+                style={{
+                  flex: 1,
+                  maxWidth: '400px',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  fontSize: '14px',
+                }}
+              />
+              <button
+                onClick={fetchListings}
+                disabled={loading}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  backgroundColor: loading ? '#6c757d' : '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                }}
+              >
+                {loading ? 'Buscando...' : 'Buscar'}
+              </button>
+              {locationFilter && (
+                <button
+                  onClick={() => {
+                    setLocationFilter('')
+                    fetchListings('')
+                  }}
+                  style={{
+                    padding: '10px 15px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    backgroundColor: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                  }}
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Mensagem de Erro */}
+          {errorLoading && (
+            <div
+              style={{
+                padding: '10px',
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+                borderRadius: '5px',
+                marginBottom: '15px',
+              }}
+            >
+              {errorLoading}
+            </div>
+          )}
+
+          {/* Lista de Listings */}
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <p>Carregando listings...</p>
+            </div>
+          ) : listings.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <p>Nenhum listing encontrado.</p>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: '20px',
+              }}
+            >
+              {listings.map((listing) => (
+                <div
+                  key={listing.id}
+                  style={{
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    padding: '15px',
+                    backgroundColor: '#fff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  <h3 style={{ marginTop: 0, marginBottom: '10px', color: '#333' }}>
+                    {listing.title}
+                  </h3>
+                  <p style={{ color: '#666', marginBottom: '10px', fontSize: '14px' }}>
+                    {listing.description}
+                  </p>
+                  <div style={{ marginBottom: '8px' }}>
+                    <strong>Preço:</strong> €{listing.price?.toFixed(2) || '0.00'}
+                  </div>
+                  <div style={{ marginBottom: '8px' }}>
+                    <strong>Tipo:</strong> {listing.vehicle?.type || 'N/A'}
+                  </div>
+                  <div style={{ marginBottom: '8px' }}>
+                    <strong>Condição:</strong> {listing.vehicle?.condition || 'N/A'}
+                  </div>
+                  <div style={{ marginBottom: '8px' }}>
+                    <strong>Pick-up:</strong> {listing.pickUpLocation || 'N/A'}
+                  </div>
+                  <div style={{ marginBottom: '8px' }}>
+                    <strong>Drop-off:</strong> {listing.dropOffLocation || 'N/A'}
+                  </div>
+                  {listing.photos && listing.photos.length > 0 && (
+                    <div style={{ marginTop: '10px' }}>
+                      <img
+                        src={`data:image/jpeg;base64,${listing.photos[0].data}`}
+                        alt={listing.title}
+                        style={{
+                          width: '100%',
+                          height: '200px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {showModal && (
           <div
