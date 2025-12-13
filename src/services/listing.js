@@ -32,3 +32,13 @@ export const getListings = async (page = 0, size = 10, sortBy = 'title', sortDir
   )
   return response.data
 }
+
+export const deleteListing = async (listingId) => {
+  const response = await axios.delete(
+    `${OWNERS_API}/listings/${listingId}`,
+    {
+      headers: getAuthHeaders(),
+    },
+  )
+  return response.data
+}

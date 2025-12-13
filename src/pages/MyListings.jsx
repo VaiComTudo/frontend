@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { getListings } from '../services/listing'
+import { getListings, deleteListing } from '../services/listing'
 
 function MyListings() {
   const [listings, setListings] = useState([])
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [deletingId, setDeletingId] = useState(null)
+  const [message, setMessage] = useState({ text: '', type: '' })
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -29,6 +31,35 @@ function MyListings() {
     fetchListings()
   }, [currentPage])
 
+  const handleRemoveListing = async (listingId) => {
+    if (!window.confirm('Are you sure you want to remove this listing? Any pending booking requests will be cancelled.')) {
+      return
+    }
+
+    setDeletingId(listingId)
+    setMessage({ text: '', type: '' })
+
+    try {
+      await deleteListing(listingId)
+      
+      // Remove the listing from the current view
+      setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
+      
+      setMessage({ text: 'Listing removed successfully!', type: 'success' })
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+    } catch (err) {
+      console.error('Error deleting listing:', err)
+      setMessage({ 
+        text: err.response?.data?.message || 'Failed to remove listing. Please try again.', 
+        type: 'error' 
+      })
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   return (
     <>
       <NavBar />
@@ -41,6 +72,22 @@ function MyListings() {
         }}
       >
         <h1>My Listings</h1>
+
+        {message.text && (
+          <div
+            id="message-banner"
+            style={{
+              padding: '12px 20px',
+              marginBottom: '20px',
+              borderRadius: '5px',
+              backgroundColor: message.type === 'success' ? '#d4edda' : '#f8d7da',
+              color: message.type === 'success' ? '#155724' : '#721c24',
+              border: `1px solid ${message.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
+            }}
+          >
+            {message.text}
+          </div>
+        )}
 
         {loading ? (
           <div
@@ -107,6 +154,26 @@ function MyListings() {
                   >
                     Status: {listing.state}
                   </p>
+                  <button
+                    id={`remove-listing-${listing.id}`}
+                    data-testid={`remove-listing-${listing.id}`}
+                    onClick={() => handleRemoveListing(listing.id)}
+                    disabled={deletingId === listing.id}
+                    style={{
+                      marginTop: '10px',
+                      padding: '8px 16px',
+                      backgroundColor: deletingId === listing.id ? '#ccc' : '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: deletingId === listing.id ? 'not-allowed' : 'pointer',
+                      width: '100%',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {deletingId === listing.id ? 'Removing...' : 'Remove'}
+                  </button>
                 </div>
               ))}
             </div>
