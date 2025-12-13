@@ -65,6 +65,7 @@ function Login() {
           alignItems: 'center',
           minHeight: 'calc(100vh - 200px)',
           padding: '20px',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         }}
       >
         <div
@@ -72,25 +73,26 @@ function Login() {
           style={{
             backgroundColor: 'white',
             padding: '40px',
-            borderRadius: '10px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            borderRadius: '15px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
             maxWidth: '400px',
             width: '100%',
           }}
         >
-          <h2 id="login-title" style={{ marginTop: 0, textAlign: 'center' }}>
-            Login
+          <h2 id="login-title" style={{ marginTop: 0, textAlign: 'center', color: '#333', fontSize: '28px', marginBottom: '30px' }}>
+            Welcome Back
           </h2>
 
           {error && (
             <div
               id="login-error"
               style={{
-                padding: '10px',
+                padding: '12px',
                 backgroundColor: '#f8d7da',
                 color: '#721c24',
-                borderRadius: '5px',
-                marginBottom: '15px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: '1px solid #f5c6cb',
               }}
             >
               {error}
@@ -98,10 +100,10 @@ function Login() {
           )}
 
           <form id="login-form" onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '15px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label
                 htmlFor="login-email"
-                style={{ display: 'block', marginBottom: '5px' }}
+                style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333' }}
               >
                 Email *
               </label>
@@ -114,17 +116,22 @@ function Login() {
                 required
                 style={{
                   width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '2px solid #e0e0e0',
+                  fontSize: '15px',
+                  transition: 'border-color 0.2s',
+                  outline: 'none',
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
               />
             </div>
 
-            <div style={{ marginBottom: '15px' }}>
+            <div style={{ marginBottom: '25px' }}>
               <label
                 htmlFor="login-password"
-                style={{ display: 'block', marginBottom: '5px' }}
+                style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333' }}
               >
                 Password *
               </label>
@@ -137,10 +144,15 @@ function Login() {
                 required
                 style={{
                   width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '2px solid #e0e0e0',
+                  fontSize: '15px',
+                  transition: 'border-color 0.2s',
+                  outline: 'none',
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
               />
             </div>
             <button
@@ -149,13 +161,26 @@ function Login() {
               disabled={isSubmitting}
               style={{
                 width: '100%',
-                padding: '10px',
+                padding: '14px',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                backgroundColor: isSubmitting ? '#6c757d' : '#007bff',
+                background: isSubmitting ? 'linear-gradient(135deg, #999 0%, #777 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '5px',
+                borderRadius: '8px',
                 fontSize: '16px',
+                fontWeight: 'bold',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)'
               }}
             >
               {isSubmitting ? 'Logging you in...' : 'Log in'}
@@ -164,13 +189,15 @@ function Login() {
 
           <div
             id="register-login-link"
-            style={{ marginTop: '15px', textAlign: 'center' }}
+            style={{ marginTop: '20px', textAlign: 'center', fontSize: '15px' }}
           >
-            <span>Don't have an account yet? </span>
+            <span style={{ color: '#666' }}>Don't have an account yet? </span>
             <a
               id="register-link"
               href="/register"
-              style={{ color: '#007bff', textDecoration: 'none' }}
+              style={{ color: '#667eea', textDecoration: 'none', fontWeight: '600' }}
+              onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+              onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
             >
               Register
             </a>
