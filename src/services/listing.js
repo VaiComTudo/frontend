@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { OWNERS_API } from '../utils/constants'
+import { OWNERS_API, RENTERS_API } from '../utils/constants'
 import { getAuthHeaders } from '../utils/utils'
 
 export const addListing = async (data) => {
@@ -40,5 +40,31 @@ export const deleteListing = async (listingId) => {
       headers: getAuthHeaders(),
     },
   )
+export const searchAvailableListings = async ({
+  category,
+  location,
+  minPrice,
+  maxPrice,
+  page = 0,
+  size = 20,
+  sortBy = 'title',
+  sortDirection = 'asc',
+}) => {
+  const params = {
+    page,
+    size,
+    sortBy,
+    sortDirection,
+  }
+
+  if (category) params.category = category
+  if (location) params.location = location
+  if (minPrice !== undefined && minPrice !== '') params.minPrice = minPrice
+  if (maxPrice !== undefined && maxPrice !== '') params.maxPrice = maxPrice
+
+  const response = await axios.get(`${RENTERS_API}/listings`, {
+    headers: getAuthHeaders(),
+    params,
+  })
   return response.data
 }
