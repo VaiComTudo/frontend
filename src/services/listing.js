@@ -40,6 +40,7 @@ export const deleteListing = async (listingId) => {
       headers: getAuthHeaders(),
     },
   )
+}
 export const searchAvailableListings = async ({
   category,
   location,
