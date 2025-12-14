@@ -10,6 +10,7 @@ function MyListings() {
   const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
   const [message, setMessage] = useState({ text: '', type: '' })
+  const [confirmDelete, setConfirmDelete] = useState({ show: false, listingId: null })
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -31,11 +32,13 @@ function MyListings() {
     fetchListings()
   }, [currentPage])
 
-  const handleRemoveListing = async (listingId) => {
-    if (!window.confirm('Are you sure you want to remove this listing? Any pending booking requests will be cancelled.')) {
-      return
-    }
+  const handleRemoveListing = (listingId) => {
+    setConfirmDelete({ show: true, listingId })
+  }
 
+  const confirmRemoveListing = async () => {
+    const listingId = confirmDelete.listingId
+    setConfirmDelete({ show: false, listingId: null })
     setDeletingId(listingId)
     setMessage({ text: '', type: '' })
 
@@ -60,9 +63,88 @@ function MyListings() {
     }
   }
 
+  const cancelRemoveListing = () => {
+    setConfirmDelete({ show: false, listingId: null })
+  }
+
   return (
     <>
       <NavBar />
+
+      {/* Confirmation Dialog */}
+      {confirmDelete.show && (
+        <div
+          id="confirm-delete-overlay"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            id="confirm-delete-dialog"
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '8px',
+              maxWidth: '400px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <h2 style={{ marginTop: 0 }}>Confirm Removal</h2>
+            <p id="confirm-delete-message">
+              Are you sure you want to remove this listing? Any pending booking requests will be cancelled.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: '10px',
+                justifyContent: 'flex-end',
+                marginTop: '20px',
+              }}
+            >
+              <button
+                id="confirm-delete-cancel"
+                onClick={cancelRemoveListing}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                id="confirm-delete-confirm"
+                onClick={confirmRemoveListing}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main
         style={{
