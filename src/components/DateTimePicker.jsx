@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function DateTimePicker({ label, value, onChange, minDate }) {
+function DateTimePicker({ label, value, onChange, minDate, id }) {
   const formatDateTimeLocal = (date) => {
     if (!date) return ''
     const d = new Date(date)
@@ -25,6 +25,7 @@ function DateTimePicker({ label, value, onChange, minDate }) {
     <div className="date-time-picker">
       <label>{label}</label>
       <input
+        id={id}
         type="datetime-local"
         value={formatDateTimeLocal(value)}
         onChange={handleChange}

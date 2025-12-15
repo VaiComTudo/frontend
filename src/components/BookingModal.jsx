@@ -51,9 +51,9 @@ function BookingModal({ listing, onClose, onSuccess }) {
 
   return (
     <div className="booking-modal-overlay" onClick={onClose}>
-      <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="booking-modal" id="booking-modal" onClick={(e) => e.stopPropagation()}>
         <div className="booking-modal-header">
-          <h2>Book: {listing.title}</h2>
+          <h2 id="booking-modal-title">Book: {listing.title}</h2>
           <button className="close-btn" onClick={onClose}>
             ×
           </button>
@@ -66,9 +66,10 @@ function BookingModal({ listing, onClose, onSuccess }) {
             <p><strong>Location:</strong> {listing.pickUpLocation}</p>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <form id="booking-form" onSubmit={handleSubmit}>
             <div className="booking-dates">
               <DateTimePicker
+                id="pickup-datetime"
                 label="Pickup Date & Time"
                 value={pickupDateTime}
                 onChange={setPickupDateTime}
@@ -76,6 +77,7 @@ function BookingModal({ listing, onClose, onSuccess }) {
               />
 
               <DateTimePicker
+                id="dropoff-datetime"
                 label="Dropoff Date & Time"
                 value={dropoffDateTime}
                 onChange={setDropoffDateTime}
@@ -83,7 +85,7 @@ function BookingModal({ listing, onClose, onSuccess }) {
               />
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div id="booking-error" className="error-message">{error}</div>}
 
             <div className="booking-modal-footer">
               <button
@@ -95,6 +97,7 @@ function BookingModal({ listing, onClose, onSuccess }) {
                 Cancel
               </button>
               <button
+                id="submit-booking-button"
                 type="submit"
                 className="btn-primary"
                 disabled={isSubmitting}
