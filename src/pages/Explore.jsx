@@ -56,6 +56,7 @@ function Explore() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+  const [bookingSuccess, setBookingSuccess] = useState(false)
 
   const daysOfWeek = [
     'MONDAY',
@@ -119,7 +120,10 @@ function Explore() {
   }
 
   const handleBookingSuccess = () => {
-    alert('Booking request submitted successfully! The owner will review your request.')
+    setBookingSuccess(true)
+    setTimeout(() => {
+      setBookingSuccess(false)
+    }, 5000)
   }
 
   // Load listings on mount and when page changes
@@ -296,6 +300,26 @@ function Explore() {
           }}
         >
           Listing created successfully!
+        </div>
+      )}
+
+      {bookingSuccess && (
+        <div
+          id="booking-success-toast"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '12px 18px',
+            borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 2000,
+            fontWeight: '600',
+          }}
+        >
+          Booking request submitted successfully! The owner will review your request.
         </div>
       )}
 
