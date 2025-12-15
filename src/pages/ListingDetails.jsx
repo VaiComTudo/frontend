@@ -187,14 +187,52 @@ function ListingDetails() {
               {listing.title}
             </h1>
             <div
-              id="listing-details-price"
               style={{
-                fontSize: '32px',
-                fontWeight: 'bold',
-                color: '#667eea',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                gap: '15px',
               }}
             >
-              €{listing.price}
+              <div
+                id="listing-details-price"
+                style={{
+                  fontSize: '32px',
+                  fontWeight: 'bold',
+                  color: '#667eea',
+                }}
+              >
+                €{listing.price}
+              </div>
+              <button
+                id="listing-details-book-button"
+                onClick={() => {}}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  background:
+                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow =
+                    '0 4px 12px rgba(102, 126, 234, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow =
+                    '0 2px 8px rgba(102, 126, 234, 0.3)'
+                }}
+              >
+                Book Now
+              </button>
             </div>
           </div>
 
@@ -216,7 +254,7 @@ function ListingDetails() {
             {listing.photos && listing.photos.length > 0 ? (
               <img
                 id="listing-details-image"
-                src={listing.photos[0].url}
+                src={`data:image/jpeg;base64,${listing.photos[0].url}`}
                 alt={listing.title}
                 style={{
                   width: '100%',
