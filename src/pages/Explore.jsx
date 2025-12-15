@@ -698,7 +698,10 @@ function Explore() {
                   <strong>Drop-off:</strong> {listing.dropOffLocation}
                 </div>
                 <button
-                  onClick={() => handleBookNow(listing)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleBookNow(listing)
+                  }}
                   style={{
                     marginTop: '15px',
                     width: '100%',
