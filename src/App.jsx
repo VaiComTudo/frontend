@@ -7,8 +7,8 @@ import MyListings from './pages/MyListings';
 import MyBookings from './pages/MyBookings';
 import OwnerBookings from './pages/OwnerBookings';
 import { UserProvider } from './context/UserContext';
-import ListingDetails from './pages/ListingDetails'
-import EditListing from './pages/EditListing'
+import ListingDetails from './pages/ListingDetails';
+import EditListing from './pages/EditListing';
 
 function App() {
   return (
