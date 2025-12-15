@@ -111,7 +111,7 @@ function Explore() {
   const handleBookNow = (listing) => {
     if (!isLoggedIn) {
       alert('Please login to book this item')
-      window.location.href = '/login'
+      navigate('/login')
       return
     }
     setSelectedListing(listing)
