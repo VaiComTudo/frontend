@@ -7,6 +7,8 @@ import MyListings from './pages/MyListings';
 import MyBookings from './pages/MyBookings';
 import OwnerBookings from './pages/OwnerBookings';
 import { UserProvider } from './context/UserContext';
+import ListingDetails from './pages/ListingDetails'
+import EditListing from './pages/EditListing'
 
 function App() {
   return (
@@ -21,8 +23,10 @@ function App() {
             <Route path='/my-listings' element={<MyListings />} />
             <Route path='/my-bookings' element={<MyBookings />} />
             <Route path='/owner-bookings' element={<OwnerBookings />} />
+            <Route path="/listing/:id" element={<ListingDetails />} />
+            <Route path="/edit-listing/:id" element={<EditListing />} />
 
-             <Route path="*" element={<Navigate to={"/"} replace />} />
+            <Route path="*" element={<Navigate to={'/'} replace />} />
           </Routes>
         </BrowserRouter>
       </div>
