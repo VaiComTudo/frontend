@@ -32,13 +32,22 @@ export const getListings = async (
 }
 
 export const deleteListing = async (listingId) => {
-  const response = await axios.delete(
+  await axios.delete(`${OWNERS_API}/listings/${listingId}`, {
+    headers: getAuthHeaders(),
+  })
+}
+
+export const updateListing = async (listingId, data) => {
+  const response = await axios.put(
     `${OWNERS_API}/listings/${listingId}`,
+    data,
     {
       headers: getAuthHeaders(),
     },
   )
+  return response.data
 }
+
 export const searchAvailableListings = async ({
   category,
   location,
