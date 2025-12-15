@@ -40,7 +40,10 @@ function BookingModal({ listing, onClose, onSuccess }) {
 
       await createBooking(bookingData)
       onSuccess?.()
-      onClose()
+      // Small delay to ensure parent state updates before modal closes
+      setTimeout(() => {
+        onClose()
+      }, 100)
     } catch (err) {
       console.error('Error creating booking:', err)
       setError(err.response?.data?.message || 'Failed to create booking request')
