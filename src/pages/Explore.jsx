@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { addListing, searchAvailableListings } from '../services/listing'
 
 function Explore() {
+  const navigate = useNavigate()
   const isLoggedIn = !!localStorage.getItem('token')
   const [showModal, setShowModal] = useState(false)
 
@@ -592,6 +594,7 @@ function Explore() {
                 key={listing.id}
                 id={`listing-${listing.id}`}
                 className="listing-card"
+                onClick={() => navigate(`/listing/${listing.id}`)}
                 style={{
                   backgroundColor: 'white',
                   border: '1px solid #e0e0e0',
@@ -599,6 +602,7 @@ function Explore() {
                   padding: '20px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)'
