@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Register from './pages/Resgister';
 import Explore from './pages/Explore';
 import MyListings from './pages/MyListings';
+import MyBookings from './pages/MyBookings';
+import OwnerBookings from './pages/OwnerBookings';
 import { UserProvider } from './context/UserContext';
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
             <Route path='/register' element={<Register />} />
             <Route path='/explore' element={<Explore />} />
             <Route path='/my-listings' element={<MyListings />} />
+            <Route path='/my-bookings' element={<MyBookings />} />
+            <Route path='/owner-bookings' element={<OwnerBookings />} />
 
              <Route path="*" element={<Navigate to={"/"} replace />} />
           </Routes>

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BookingModal from '../components/BookingModal'
 import { addListing, searchAvailableListings } from '../services/listing'
 
 function Explore() {
   const isLoggedIn = !!localStorage.getItem('token')
   const [showModal, setShowModal] = useState(false)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [selectedListing, setSelectedListing] = useState(null)
 
   // -- Search Filters --
   const [searchFilters, setSearchFilters] = useState({
@@ -101,6 +104,20 @@ function Explore() {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage)
+  }
+
+  const handleBookNow = (listing) => {
+    if (!isLoggedIn) {
+      alert('Please login to book this item')
+      window.location.href = '/login'
+      return
+    }
+    setSelectedListing(listing)
+    setShowBookingModal(true)
+  }
+
+  const handleBookingSuccess = () => {
+    alert('Booking request submitted successfully! The owner will review your request.')
   }
 
   // Load listings on mount and when page changes
@@ -676,9 +693,45 @@ function Explore() {
                 >
                   <strong>Drop-off:</strong> {listing.dropOffLocation}
                 </div>
+                <button
+                  onClick={() => handleBookNow(listing)}
+                  style={{
+                    marginTop: '15px',
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#5568d3'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#667eea'
+                  }}
+                >
+                  Book Now
+                </button>
               </div>
             ))}
           </div>
+        )}
+
+        {/* Booking Modal */}
+        {showBookingModal && selectedListing && (
+          <BookingModal
+            listing={selectedListing}
+            onClose={() => {
+              setShowBookingModal(false)
+              setSelectedListing(null)
+            }}
+            onSuccess={handleBookingSuccess}
+          />
         )}
 
         {/* Pagination */}
