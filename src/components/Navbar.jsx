@@ -91,6 +91,34 @@ function NavBar() {
                 My Listings
               </button>
             </a>
+            <a href="/my-bookings" style={{ textDecoration: 'none' }}>
+              <button
+                id="nav-my-bookings"
+                style={textButtonStyle}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f5f5f5'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                }}
+              >
+                My Bookings
+              </button>
+            </a>
+            <a href="/owner-bookings" style={{ textDecoration: 'none' }}>
+              <button
+                id="nav-owner-bookings"
+                style={textButtonStyle}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f5f5f5'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                }}
+              >
+                Booking Requests
+              </button>
+            </a>
             <button
               id="nav-logout"
               onClick={handleLogout}
