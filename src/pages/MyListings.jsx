@@ -50,6 +50,7 @@ function MyListings() {
     try {
       await deleteListing(listingId)
 
+
       // Remove the listing from the current view
       setListings((prevListings) =>
         prevListings.filter((listing) => listing.id !== listingId),
@@ -57,15 +58,14 @@ function MyListings() {
 
       setMessage({ text: 'Listing removed successfully!', type: 'success' })
 
+
       // Clear message after 3 seconds
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
     } catch (err) {
       console.error('Error deleting listing:', err)
       setMessage({
-        text:
-          err.response?.data?.message ||
-          'Failed to remove listing. Please try again.',
-        type: 'error',
+        text: err.response?.data?.message || 'Failed to remove listing. Please try again.',
+        type: 'error'
       })
     } finally {
       setDeletingId(null)
@@ -361,6 +361,136 @@ function MyListings() {
                   </div>
                 </div>
               ))}
+              {listings.map((listing) => {
+                const listingId = String(listing.id)
+                return (
+                  <div
+                    key={listingId}
+                    id={`listing-${listingId}`}
+                    data-testid={`listing-${listingId}`}
+                    style={{
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      backgroundColor: 'white',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    <h3
+                      id={`listing-title-${listingId}`}
+                      style={{
+                        marginTop: 0,
+                        marginBottom: '10px',
+                        fontSize: '20px',
+                        color: '#333'
+                      }}
+                    >
+                      {listing.title}
+                    </h3>
+                    <p
+                      id={`listing-description-${listingId}`}
+                      style={{
+                        color: '#666',
+                        fontSize: '14px',
+                        lineHeight: '1.5',
+                        marginBottom: '12px'
+                      }}
+                    >
+                      {listing.description}
+                    </p>
+                    <p
+                      id={`listing-price-${listingId}`}
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#667eea',
+                        fontSize: '22px',
+                        marginBottom: '10px'
+                      }}
+                    >
+                      €{listing.price}
+                    </p>
+                    <p
+                      id={`listing-vehicle-${listingId}`}
+                      style={{
+                        fontSize: '13px',
+                        color: '#666',
+                        marginBottom: '8px'
+                      }}
+                    >
+                      <strong>Vehicle:</strong> {listing.vehicle?.type} - {listing.vehicle?.condition}
+                    </p>
+                    <p
+                      id={`listing-state-${listingId}`}
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        display: 'inline-block',
+                        backgroundColor:
+                          listing.state === 'AVAILABLE' ? '#d4edda' : '#e2e3e5',
+                        color:
+                          listing.state === 'AVAILABLE' ? '#155724' : '#383d41',
+                      }}
+                    >
+                      {listing.state}
+                    </p>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                      <button
+                        type="button"
+                        id={`edit-listing-${listingId}`}
+                        onClick={() => navigate(`/edit-listing/${listingId}`)}
+                        style={{
+                          flex: 1,
+                          padding: '8px 16px',
+                          backgroundColor: '#667eea',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          position: 'relative',
+                          zIndex: 1,
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        id={`remove-listing-${listingId}`}
+                        data-testid={`remove-listing-${listingId}`}
+                        onClick={() => handleRemoveListing(listing.id)}
+                        disabled={deletingId === listing.id}
+                        style={{
+                          flex: 1,
+                          padding: '8px 16px',
+                          backgroundColor: deletingId === listing.id ? '#ccc' : '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: deletingId === listing.id ? 'not-allowed' : 'pointer',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          position: 'relative',
+                          zIndex: 1,
+                        }}
+                      >
+                        {deletingId === listing.id ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
             {totalPages > 1 && (
