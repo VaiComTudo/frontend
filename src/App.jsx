@@ -8,6 +8,8 @@ import ListingDetails from './pages/ListingDetails'
 import Checkout from './pages/Checkout'
 import EditListing from './pages/EditListing'
 import { UserProvider } from './context/UserContext'
+import MyBookings from './pages/MyBookings';
+import OwnerBookings from './pages/OwnerBookings';
 
 function App() {
   return (
@@ -15,15 +17,16 @@ function App() {
       <div>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/explore" element={<Explore />} />
+            <Route path='/' element={<Home />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+            <Route path='/explore' element={<Explore />} />
+            <Route path='/my-listings' element={<MyListings />} />
+            <Route path='/my-bookings' element={<MyBookings />} />
+            <Route path='/owner-bookings' element={<OwnerBookings />} />
             <Route path="/listing/:id" element={<ListingDetails />} />
             <Route path="/checkout/:id" element={<Checkout />} />
-            <Route path="/my-listings" element={<MyListings />} />
             <Route path="/edit-listing/:id" element={<EditListing />} />
-
             <Route path="*" element={<Navigate to={'/'} replace />} />
           </Routes>
         </BrowserRouter>

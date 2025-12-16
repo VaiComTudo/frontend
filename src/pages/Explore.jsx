@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BookingModal from '../components/BookingModal'
 import { addListing, searchAvailableListings } from '../services/listing'
 
 function Explore() {
   const navigate = useNavigate()
   const isLoggedIn = !!localStorage.getItem('token')
   const [showModal, setShowModal] = useState(false)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [selectedListing, setSelectedListing] = useState(null)
 
   // -- Search Filters --
   const [searchFilters, setSearchFilters] = useState({
@@ -53,10 +56,7 @@ function Explore() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
-
-  // -- Booking Modal State --
-  const [showBookingModal, setShowBookingModal] = useState(false)
-  const [bookingListing, setBookingListing] = useState(null)
+  const [bookingSuccess, setBookingSuccess] = useState(false)
 
   const daysOfWeek = [
     'MONDAY',
@@ -107,6 +107,23 @@ function Explore() {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage)
+  }
+
+  const handleBookNow = (listing) => {
+    if (!isLoggedIn) {
+      alert('Please login to book this item')
+      navigate('/login')
+      return
+    }
+    setSelectedListing(listing)
+    setShowBookingModal(true)
+  }
+
+  const handleBookingSuccess = () => {
+    setBookingSuccess(true)
+    setTimeout(() => {
+      setBookingSuccess(false)
+    }, 5000)
   }
 
   // Load listings on mount and when page changes
@@ -283,6 +300,26 @@ function Explore() {
           }}
         >
           Listing created successfully!
+        </div>
+      )}
+
+      {bookingSuccess && (
+        <div
+          id="booking-success-toast"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '12px 18px',
+            borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 2000,
+            fontWeight: '600',
+          }}
+        >
+          Booking request submitted successfully! The owner will review your request.
         </div>
       )}
 
@@ -691,8 +728,7 @@ function Explore() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setBookingListing(listing)
-                      setShowBookingModal(true)
+                      handleBookNow(listing)
                     }}
                     style={{
                       width: '100%',
@@ -723,6 +759,18 @@ function Explore() {
               )
             })}
           </div>
+        )}
+
+        {/* Booking Modal */}
+        {showBookingModal && selectedListing && (
+          <BookingModal
+            listing={selectedListing}
+            onClose={() => {
+              setShowBookingModal(false)
+              setSelectedListing(null)
+            }}
+            onSuccess={handleBookingSuccess}
+          />
         )}
 
         {/* Pagination */}
@@ -1503,134 +1551,6 @@ function Explore() {
         </div>
       )}
 
-      {/* Booking Modal */}
-      {showBookingModal && bookingListing && (
-        <div
-          id="booking-modal"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-          }}
-          onClick={() => setShowBookingModal(false)}
-        >
-          <div
-            style={{
-              backgroundColor: 'white',
-              padding: '30px',
-              borderRadius: '12px',
-              maxWidth: '500px',
-              width: '90%',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>
-              Book {bookingListing.title}
-            </h2>
-            <form
-              id="booking-form"
-              onSubmit={(e) => {
-                e.preventDefault()
-                // Para os testes, basta fechar o modal e manter-nos em /explore
-                setShowBookingModal(false)
-              }}
-            >
-              <div style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontWeight: '600',
-                    color: '#333',
-                  }}
-                >
-                  Pickup Date & Time
-                </label>
-                <input
-                  id="pickup-datetime"
-                  type="datetime-local"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    border: '2px solid #e0e0e0',
-                    fontSize: '14px',
-                    outline: 'none',
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontWeight: '600',
-                    color: '#333',
-                  }}
-                >
-                  Dropoff Date & Time
-                </label>
-                <input
-                  id="dropoff-datetime"
-                  type="datetime-local"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    border: '2px solid #e0e0e0',
-                    fontSize: '14px',
-                    outline: 'none',
-                  }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowBookingModal(false)}
-                  style={{
-                    padding: '10px 20px',
-                    cursor: 'pointer',
-                    backgroundColor: '#e9ecef',
-                    color: '#495057',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  id="submit-booking-button"
-                  type="submit"
-                  style={{
-                    padding: '10px 20px',
-                    cursor: 'pointer',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                  }}
-                >
-                  Submit booking request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </>

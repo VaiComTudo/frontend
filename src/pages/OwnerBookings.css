@@ -1,0 +1,319 @@
+.bookings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: calc(100vh - 160px);
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.header-section h1 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pending-badge {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.filter-section label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #fecaca;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f9fafb;
+  border-radius: 12px;
+  margin-top: 30px;
+}
+
+.empty-state p {
+  color: #6b7280;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.empty-hint {
+  font-size: 1rem;
+  color: #9ca3af;
+}
+
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.booking-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #e5e7eb;
+}
+
+.booking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.booking-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1f2937;
+  flex: 1;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-denied {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-cancelled {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.status-in-progress {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-stolen {
+  background-color: #fecaca;
+  color: #7f1d1d;
+}
+
+.booking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #1f2937;
+  text-align: right;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+.btn-approve,
+.btn-deny,
+.btn-status {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-approve {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-approve:hover {
+  background-color: #059669;
+}
+
+.btn-deny {
+  background-color: #dc2626;
+  color: white;
+}
+
+.btn-deny:hover {
+  background-color: #b91c1c;
+}
+
+.btn-status {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-status:hover {
+  background-color: #2563eb;
+}
+
+.btn-complete {
+  background-color: #10b981;
+}
+
+.btn-complete:hover {
+  background-color: #059669;
+}
+
+.btn-stolen {
+  background-color: #dc2626;
+}
+
+.btn-stolen:hover {
+  background-color: #b91c1c;
+}
+
+@media (max-width: 768px) {
+  .bookings-container {
+    padding: 20px 15px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .header-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .bookings-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .booking-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-badge {
+    align-self: flex-start;
+  }
+
+  .booking-actions {
+    flex-direction: column;
+  }
+
+  .btn-approve,
+  .btn-deny,
+  .btn-status {
+    width: 100%;
+  }
+}
