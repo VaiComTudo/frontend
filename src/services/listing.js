@@ -83,10 +83,3 @@ export const getListingById = async (listingId) => {
   })
   return response.data
 }
-
-export const updateListing = async (listingId, data) => {
-  const response = await axios.put(`${OWNERS_API}/listings/${listingId}`, data, {
-    headers: getAuthHeaders(),
-  })
-  return response.data
-}
