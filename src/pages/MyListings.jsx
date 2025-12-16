@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { getListings, deleteListing } from '../services/listing'
 
 function MyListings() {
+  const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -44,19 +46,19 @@ function MyListings() {
 
     try {
       await deleteListing(listingId)
-      
+
       // Remove the listing from the current view
       setListings(prevListings => prevListings.filter(listing => listing.id !== listingId))
-      
+
       setMessage({ text: 'Listing removed successfully!', type: 'success' })
-      
+
       // Clear message after 3 seconds
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
     } catch (err) {
       console.error('Error deleting listing:', err)
-      setMessage({ 
-        text: err.response?.data?.message || 'Failed to remove listing. Please try again.', 
-        type: 'error' 
+      setMessage({
+        text: err.response?.data?.message || 'Failed to remove listing. Please try again.',
+        type: 'error'
       })
     } finally {
       setDeletingId(null)
@@ -290,26 +292,44 @@ function MyListings() {
                   >
                     {listing.state}
                   </p>
-                  <button
-                    id={`remove-listing-${listing.id}`}
-                    data-testid={`remove-listing-${listing.id}`}
-                    onClick={() => handleRemoveListing(listing.id)}
-                    disabled={deletingId === listing.id}
-                    style={{
-                      marginTop: '10px',
-                      padding: '8px 16px',
-                      backgroundColor: deletingId === listing.id ? '#ccc' : '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '5px',
-                      cursor: deletingId === listing.id ? 'not-allowed' : 'pointer',
-                      width: '100%',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {deletingId === listing.id ? 'Removing...' : 'Remove'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button
+                      id={`edit-listing-${listing.id}`}
+                      onClick={() => navigate(`/edit-listing/${listing.id}`)}
+                      style={{
+                        flex: 1,
+                        padding: '8px 16px',
+                        backgroundColor: '#667eea',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      id={`remove-listing-${listing.id}`}
+                      data-testid={`remove-listing-${listing.id}`}
+                      onClick={() => handleRemoveListing(listing.id)}
+                      disabled={deletingId === listing.id}
+                      style={{
+                        flex: 1,
+                        padding: '8px 16px',
+                        backgroundColor: deletingId === listing.id ? '#ccc' : '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: deletingId === listing.id ? 'not-allowed' : 'pointer',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {deletingId === listing.id ? 'Removing...' : 'Remove'}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

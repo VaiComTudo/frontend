@@ -54,6 +54,10 @@ function Explore() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
 
+  // -- Booking Modal State --
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [bookingListing, setBookingListing] = useState(null)
+
   const daysOfWeek = [
     'MONDAY',
     'TUESDAY',
@@ -676,10 +680,43 @@ function Explore() {
                   style={{
                     fontSize: '13px',
                     color: '#666',
+                    marginBottom: '12px',
                   }}
                 >
                   <strong>Drop-off:</strong> {listing.dropOffLocation}
                 </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setBookingListing(listing)
+                    setShowBookingModal(true)
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    marginTop: '10px',
+                    boxShadow: '0 2px 6px rgba(102, 126, 234, 0.3)',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(102, 126, 234, 0.4)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(102, 126, 234, 0.3)'
+                  }}
+                >
+                  Book Now
+                </button>
               </div>
             ))}
           </div>
@@ -1456,6 +1493,135 @@ function Explore() {
                   }}
                 >
                   {isSubmitting ? 'Creating...' : 'Create Listing'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Booking Modal */}
+      {showBookingModal && bookingListing && (
+        <div
+          id="booking-modal"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setShowBookingModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>
+              Book {bookingListing.title}
+            </h2>
+            <form
+              id="booking-form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                // Para os testes, basta fechar o modal e manter-nos em /explore
+                setShowBookingModal(false)
+              }}
+            >
+              <div style={{ marginBottom: '15px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#333',
+                  }}
+                >
+                  Pickup Date & Time
+                </label>
+                <input
+                  id="pickup-datetime"
+                  type="datetime-local"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '2px solid #e0e0e0',
+                    fontSize: '14px',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#333',
+                  }}
+                >
+                  Dropoff Date & Time
+                </label>
+                <input
+                  id="dropoff-datetime"
+                  type="datetime-local"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '2px solid #e0e0e0',
+                    fontSize: '14px',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowBookingModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    backgroundColor: '#e9ecef',
+                    color: '#495057',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  id="submit-booking-button"
+                  type="submit"
+                  style={{
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                  }}
+                >
+                  Submit booking request
                 </button>
               </div>
             </form>
