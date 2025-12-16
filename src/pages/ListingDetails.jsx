@@ -206,7 +206,7 @@ function ListingDetails() {
               </div>
               <button
                 id="listing-details-book-button"
-                onClick={() => {}}
+                onClick={() => navigate(`/checkout/${id}`)}
                 style={{
                   padding: '12px 32px',
                   fontSize: '16px',

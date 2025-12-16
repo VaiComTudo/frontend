@@ -5,6 +5,7 @@ import Register from './pages/Resgister'
 import Explore from './pages/Explore'
 import MyListings from './pages/MyListings'
 import ListingDetails from './pages/ListingDetails'
+import Checkout from './pages/Checkout'
 import { UserProvider } from './context/UserContext'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/listing/:id" element={<ListingDetails />} />
+            <Route path="/checkout/:id" element={<Checkout />} />
             <Route path="/my-listings" element={<MyListings />} />
 
             <Route path="*" element={<Navigate to={'/'} replace />} />
