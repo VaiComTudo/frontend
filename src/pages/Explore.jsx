@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BookingModal from '../components/BookingModal'
 import { addListing, searchAvailableListings } from '../services/listing'
 
 function Explore() {
   const navigate = useNavigate()
   const isLoggedIn = !!localStorage.getItem('token')
   const [showModal, setShowModal] = useState(false)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [selectedListing, setSelectedListing] = useState(null)
 
   // -- Search Filters --
   const [searchFilters, setSearchFilters] = useState({
@@ -53,6 +56,7 @@ function Explore() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+  const [bookingSuccess, setBookingSuccess] = useState(false)
 
   const daysOfWeek = [
     'MONDAY',
@@ -103,6 +107,23 @@ function Explore() {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage)
+  }
+
+  const handleBookNow = (listing) => {
+    if (!isLoggedIn) {
+      alert('Please login to book this item')
+      navigate('/login')
+      return
+    }
+    setSelectedListing(listing)
+    setShowBookingModal(true)
+  }
+
+  const handleBookingSuccess = () => {
+    setBookingSuccess(true)
+    setTimeout(() => {
+      setBookingSuccess(false)
+    }, 5000)
   }
 
   // Load listings on mount and when page changes
@@ -279,6 +300,26 @@ function Explore() {
           }}
         >
           Listing created successfully!
+        </div>
+      )}
+
+      {bookingSuccess && (
+        <div
+          id="booking-success-toast"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '12px 18px',
+            borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 2000,
+            fontWeight: '600',
+          }}
+        >
+          Booking request submitted successfully! The owner will review your request.
         </div>
       )}
 
@@ -680,9 +721,48 @@ function Explore() {
                 >
                   <strong>Drop-off:</strong> {listing.dropOffLocation}
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleBookNow(listing)
+                  }}
+                  style={{
+                    marginTop: '15px',
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#5568d3'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#667eea'
+                  }}
+                >
+                  Book Now
+                </button>
               </div>
             ))}
           </div>
+        )}
+
+        {/* Booking Modal */}
+        {showBookingModal && selectedListing && (
+          <BookingModal
+            listing={selectedListing}
+            onClose={() => {
+              setShowBookingModal(false)
+              setSelectedListing(null)
+            }}
+            onSuccess={handleBookingSuccess}
+          />
         )}
 
         {/* Pagination */}
