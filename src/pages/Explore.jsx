@@ -593,132 +593,135 @@ function Explore() {
               marginBottom: '30px',
             }}
           >
-            {listings.map((listing) => (
-              <div
-                key={listing.id}
-                id={`listing-${listing.id}`}
-                className="listing-card"
-                onClick={() => navigate(`/listing/${listing.id}`)}
-                style={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '12px',
-                  padding: '20px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)'
-                  e.currentTarget.style.boxShadow =
-                    '0 6px 16px rgba(0,0,0,0.12)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'
-                }}
-              >
-                <h3
-                  className="listing-title"
-                  style={{
-                    margin: '0 0 12px 0',
-                    fontSize: '20px',
-                    fontWeight: '600',
-                    color: '#333',
-                  }}
-                >
-                  {listing.title}
-                </h3>
-                <p
-                  className="listing-description"
-                  style={{
-                    margin: '0 0 15px 0',
-                    fontSize: '14px',
-                    color: '#666',
-                    lineHeight: '1.5',
-                  }}
-                >
-                  {listing.description}
-                </p>
-                <div style={{ marginBottom: '12px' }}>
-                  <span
-                    className="listing-price"
-                    style={{
-                      fontSize: '24px',
-                      fontWeight: 'bold',
-                      color: '#667eea',
-                    }}
-                  >
-                    €{listing.price}
-                  </span>
-                </div>
-                {listing.vehicle && (
-                  <div
-                    className="listing-vehicle"
-                    style={{
-                      fontSize: '13px',
-                      color: '#666',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    <strong>Type:</strong> {listing.vehicle.type} |{' '}
-                    <strong>Condition:</strong> {listing.vehicle.condition}
-                  </div>
-                )}
+            {listings.map((listing) => {
+              const listingId = String(listing.id)
+              return (
                 <div
-                  className="listing-location"
+                  key={listingId}
+                  id={`listing-${listingId}`}
+                  className="listing-card"
+                  onClick={() => navigate(`/listing/${listingId}`)}
                   style={{
-                    fontSize: '13px',
-                    color: '#666',
-                    marginBottom: '6px',
-                  }}
-                >
-                  <strong>Pick-up:</strong> {listing.pickUpLocation}
-                </div>
-                <div
-                  className="listing-location"
-                  style={{
-                    fontSize: '13px',
-                    color: '#666',
-                    marginBottom: '12px',
-                  }}
-                >
-                  <strong>Drop-off:</strong> {listing.dropOffLocation}
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setBookingListing(listing)
-                    setShowBookingModal(true)
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px 20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    marginTop: '10px',
-                    boxShadow: '0 2px 6px rgba(102, 126, 234, 0.3)',
+                    backgroundColor: 'white',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     transition: 'transform 0.2s, box-shadow 0.2s',
+                    cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(102, 126, 234, 0.4)'
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                    e.currentTarget.style.boxShadow =
+                      '0 6px 16px rgba(0,0,0,0.12)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(102, 126, 234, 0.3)'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'
                   }}
                 >
-                  Book Now
-                </button>
-              </div>
-            ))}
+                  <h3
+                    className="listing-title"
+                    style={{
+                      margin: '0 0 12px 0',
+                      fontSize: '20px',
+                      fontWeight: '600',
+                      color: '#333',
+                    }}
+                  >
+                    {listing.title}
+                  </h3>
+                  <p
+                    className="listing-description"
+                    style={{
+                      margin: '0 0 15px 0',
+                      fontSize: '14px',
+                      color: '#666',
+                      lineHeight: '1.5',
+                    }}
+                  >
+                    {listing.description}
+                  </p>
+                  <div style={{ marginBottom: '12px' }}>
+                    <span
+                      className="listing-price"
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#667eea',
+                      }}
+                    >
+                      €{listing.price}
+                    </span>
+                  </div>
+                  {listing.vehicle && (
+                    <div
+                      className="listing-vehicle"
+                      style={{
+                        fontSize: '13px',
+                        color: '#666',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      <strong>Type:</strong> {listing.vehicle.type} |{' '}
+                      <strong>Condition:</strong> {listing.vehicle.condition}
+                    </div>
+                  )}
+                  <div
+                    className="listing-location"
+                    style={{
+                      fontSize: '13px',
+                      color: '#666',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    <strong>Pick-up:</strong> {listing.pickUpLocation}
+                  </div>
+                  <div
+                    className="listing-location"
+                    style={{
+                      fontSize: '13px',
+                      color: '#666',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    <strong>Drop-off:</strong> {listing.dropOffLocation}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setBookingListing(listing)
+                      setShowBookingModal(true)
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 20px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      marginTop: '10px',
+                      boxShadow: '0 2px 6px rgba(102, 126, 234, 0.3)',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 10px rgba(102, 126, 234, 0.4)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(102, 126, 234, 0.3)'
+                    }}
+                  >
+                    Book Now
+                  </button>
+                </div>
+              )
+            })}
           </div>
         )}
 
